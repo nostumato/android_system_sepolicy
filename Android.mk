@@ -261,7 +261,17 @@ $(plat_pub_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(plat_pub_policy.conf): PRIVATE_FULL_TREBLE := $(PRODUCT_FULL_TREBLE)
 $(plat_pub_policy.conf): $(call build_policy, $(sepolicy_build_files), \
 $(PLAT_PUBLIC_POLICY) $(REQD_MASK_POLICY))
-	$(transform-policy-to-conf)
+	@mkdir -p $(dir $@)
+	 $(hide) m4 $(PRIVATE_ADDITIONAL_M4DEFS) \
+		-D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+		-D target_build_variant=$(TARGET_BUILD_VARIANT) \
+		-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+		-D target_arch=$(PRIVATE_TGT_ARCH) \
+		-D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
+		-D target_full_treble=$(PRODUCT_FULL_TREBLE) \
+		-D target_needs_platform_text_relocations=$(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS) \
+		-s $^ > $@
+
 plat_pub_policy.cil := $(intermediates)/plat_pub_policy.cil
 $(plat_pub_policy.cil): PRIVATE_POL_CONF := $(plat_pub_policy.conf)
 $(plat_pub_policy.cil): PRIVATE_REQD_MASK := $(reqd_policy_mask.cil)
@@ -309,7 +319,16 @@ $(plat_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(plat_policy.conf): PRIVATE_FULL_TREBLE := $(PRODUCT_FULL_TREBLE)
 $(plat_policy.conf): $(call build_policy, $(sepolicy_build_files), \
 $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY))
-	$(transform-policy-to-conf)
+	@mkdir -p $(dir $@)
+	$(hide) m4 $(PRIVATE_ADDITIONAL_M4DEFS) \
+		-D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+		-D target_build_variant=$(TARGET_BUILD_VARIANT) \
+		-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+		-D target_arch=$(PRIVATE_TGT_ARCH) \
+		-D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
+		-D target_full_treble=$(PRODUCT_FULL_TREBLE) \
+		-D target_needs_platform_text_relocations=$(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS) \
+		-s $^ > $@
 	$(hide) sed '/dontaudit/d' $@ > $@.dontaudit
 
 $(LOCAL_BUILT_MODULE): PRIVATE_ADDITIONAL_CIL_FILES := \
@@ -424,7 +443,16 @@ $(nonplat_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(nonplat_policy.conf): PRIVATE_FULL_TREBLE := $(PRODUCT_FULL_TREBLE)
 $(nonplat_policy.conf): $(call build_policy, $(sepolicy_build_files), \
 $(PLAT_PUBLIC_POLICY) $(REQD_MASK_POLICY) $(PLAT_VENDOR_POLICY) $(BOARD_SEPOLICY_DIRS))
-	$(transform-policy-to-conf)
+	@mkdir -p $(dir $@)
+	$(hide) m4 $(PRIVATE_ADDITIONAL_M4DEFS) \
+		-D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+		-D target_build_variant=$(TARGET_BUILD_VARIANT) \
+		-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+		-D target_arch=$(PRIVATE_TGT_ARCH) \
+		-D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
+		-D target_full_treble=$(PRODUCT_FULL_TREBLE) \
+		-D target_needs_platform_text_relocations=$(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS) \
+		-s $^ > $@
 	$(hide) sed '/dontaudit/d' $@ > $@.dontaudit
 
 nonplat_policy_raw := $(intermediates)/nonplat_policy_raw.cil
@@ -544,7 +572,16 @@ $(sepolicy.recovery.conf): PRIVATE_TGT_RECOVERY := -D target_recovery=true
 $(sepolicy.recovery.conf): $(call build_policy, $(sepolicy_build_files), \
                            $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY) \
                            $(PLAT_VENDOR_POLICY) $(BOARD_SEPOLICY_DIRS))
-	$(transform-policy-to-conf)
+	@mkdir -p $(dir $@)
+	$(hide) m4 $(PRIVATE_ADDITIONAL_M4DEFS) \
+		-D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+		-D target_build_variant=$(TARGET_BUILD_VARIANT) \
+		-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+		-D target_arch=$(PRIVATE_TGT_ARCH) \
+		-D target_with_asan=$(PRIVATE_TGT_WITH_ASAN) \
+		-D target_recovery=true \
+		-D target_needs_platform_text_relocations=$(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS) \
+		-s $^ > $@
 	$(hide) sed '/dontaudit/d' $@ > $@.dontaudit
 
 $(LOCAL_BUILT_MODULE): $(sepolicy.recovery.conf) $(HOST_OUT_EXECUTABLES)/checkpolicy \
@@ -583,7 +620,15 @@ $(LOCAL_BUILT_MODULE): PRIVATE_WITH_ASAN := false
 $(LOCAL_BUILT_MODULE): PRIVATE_FULL_TREBLE := cts
 $(LOCAL_BUILT_MODULE): $(call build_policy, $(sepolicy_build_files), \
 $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY))
-	$(transform-policy-to-conf)
+	mkdir -p $(dir $@)
+	$(hide) m4 -D mls_num_sens=$(PRIVATE_MLS_SENS) -D mls_num_cats=$(PRIVATE_MLS_CATS) \
+		-D target_build_variant=user \
+		-D target_with_dexpreopt=$(WITH_DEXPREOPT) \
+		-D target_arch=$(PRIVATE_TGT_ARCH) \
+		-D target_with_asan=false \
+		-D target_full_treble=cts \
+		-D target_needs_platform_text_relocations=$(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS) \
+		-s $^ > $@
 	$(hide) sed '/dontaudit/d' $@ > $@.dontaudit
 
 ##################################
