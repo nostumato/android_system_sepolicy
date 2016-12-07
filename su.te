@@ -27,6 +27,7 @@ userdebug_or_eng(`
 
   # Allow private apps (like masquerade) to use su
   allow priv_app su_exec:file { execute_no_trans getattr open read execute };
+  allow platform_app su_exec:file { execute_no_trans getattr open read execute };
 
   # Add su to various domains
   net_domain(su)
