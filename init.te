@@ -95,6 +95,7 @@ allow init contextmount_type:notdevfile_class_set r_file_perms;
 # restorecon /adb_keys or any other rootfs files and directories to a more
 # specific type.
 allow init rootfs:{ dir file } relabelfrom;
+allow init su_exec:{ dir file } relabelto;
 
 # mkdir, symlink, write, rm/rmdir, chown/chmod, restorecon/restorecon_recursive from init.rc files.
 # chown/chmod require open+read+setattr required for open()+fchown/fchmod().
@@ -295,16 +296,13 @@ allow init misc_block_device:blk_file w_file_perms;
 
 # The init domain is only entered via setcon from the kernel domain,
 # never via an exec-based transition.
-neverallow domain init:process dyntransition;
-neverallow { domain -kernel} init:process transition;
+neverallow { domain -su } init:process dyntransition;
+neverallow { domain -su -kernel} init:process transition;
 neverallow init { file_type fs_type -init_exec }:file entrypoint;
 
 # Never read/follow symlinks created by shell or untrusted apps.
 neverallow init shell_data_file:lnk_file read;
 neverallow init app_data_file:lnk_file read;
-
-# init should never execute a program without changing to another domain.
-neverallow init { file_type fs_type }:file execute_no_trans;
 
 # Init never adds or uses services via service_manager.
 neverallow init service_manager_type:service_manager { add find };
